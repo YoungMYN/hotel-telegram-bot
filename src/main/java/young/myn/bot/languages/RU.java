@@ -1,9 +1,32 @@
 package young.myn.bot.languages;
 
-public class RU {
-    public static final String START_STRING = "Hi, %s! Welcome to Holiday Hotel!\n" +
-            "This bot will help you book a room, show available dates, as well as our prices and much more.";
-    public static final String NOT_RECOGNISED_COMMAND = "Unfortunately, I don't understand the command.\n"+
-            " Please select an item from the menu.";
+import lombok.Data;
 
+import java.util.Arrays;
+import java.util.List;
+
+@Data
+public class RU extends Language{
+    private final String startString = "Здравствуй, %s! Приветствуем тебя в нашем отеле! !\n" +
+            "Этот бот поможет тебе забронировать комнату, покажет доступные даты, а также наши цены и много чего еще.";
+    private final String notRecognisedCommandString = "К сожалению, я не понимаю такую команду...\n"+
+            " Пожалуйста, выберите элемент из меню.";
+
+    private final String priceDescription = "цены на наши номера";
+    private final String roomsDescription ="описание и фото наших номеров";
+    private final String reservationDescription ="свободные даты/бронь";
+    private final String contactsDescription = "связаться с нами";
+    private final String helpDescription ="руководство к пользованию ботом";
+    private final List<String> mainMenuButtons = Arrays.asList("Виды номеров","Цены","Бронирование",
+            "Контакты","Помощь");
+    private final String roomsMenuDescription = "Выберите комнату";
+    private final List<String> roomsMenuButtons = Arrays.asList("Одноместный номер","Двухместный эконом",
+            "Двухместный комфорт","Президентский люкс","<- Назад");
+    private final String singleRoomDescription = "Небольшой, но очень уютный номер (23м²) с отдельным санузлом";
+    private final String doubleEconomyRoomDescription="Небольшой номер на двоих с совмещенной кроватью.";
+    private final String doubleComfortRoomDescription="Номер на двоих повышенной комфортности с увеличенной площадью," +
+            " удобствами и прекрасным панорамным видом.";
+    private final String luxRoomDescription="Роскошный королевский номер площадью более 150м²," +
+            " с отдельной столовой, лоджией и личным лифтом.";
+    private final String backString = "<- Назад";
 }
