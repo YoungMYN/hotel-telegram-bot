@@ -81,7 +81,22 @@ public class Keyboards {
 
         InlineKeyboardButton button = new InlineKeyboardButton();
         button.setText(language.getBackString());
-        button.setCallbackData("back_to_rooms");
+        button.setCallbackData("rooms");
+        row.add(button);
+
+        rows.add(row);
+
+        markup.setKeyboard(rows);
+        return markup;
+    }
+    public InlineKeyboardMarkup getBackToMainMenuKeyboard(Language language){
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
+
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        button.setText(language.getBackString());
+        button.setCallbackData("back_to_main_menu");
         row.add(button);
 
         rows.add(row);

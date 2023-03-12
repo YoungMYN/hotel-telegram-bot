@@ -19,6 +19,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import young.myn.bot.config.BotConfig;
+import young.myn.bot.config.ImagesConfig;
 import young.myn.bot.languages.*;
 
 import java.io.File;
@@ -52,15 +53,16 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if(update.hasMessage() && update.getMessage().hasText()){
+            long chatId = update.getMessage().getChatId();
             String messageText = update.getMessage().getText();
             switch (messageText){
                 case "/start":
-                    chooseLanguage(update.getMessage().getChatId());
+                    chooseLanguage(chatId);
                     log.info("User "+ update.getMessage().getChat().getUserName()+" started");
                     break;
                 default:
                     log.info("Command from user "+update.getMessage().getChat().getUserName()+" was not recognised");
-                    sendMessage(update.getMessage().getChatId(),language.getNotRecognisedCommandString());
+                    sendMessage(chatId,language.getNotRecognisedCommandString());
                     break;
             }
         }
@@ -82,13 +84,13 @@ public class TelegramBot extends TelegramLongPollingBot {
                             String.format(language.getStartString(),update.getCallbackQuery()
                                     .getMessage().getChat().getFirstName()),keyboards.getMainMenuKeyboard(language));
                     break;
+                //sets the room selection menu
                 case "rooms":
-                    System.out.println(1);
                     setRoomsPage(chatId,
                             messageId);
                     break;
                 case "prices":
-                    System.out.println(2);
+                    showPrises(chatId,messageId);
                     break;
                 case "reserve":
                     System.out.println(3);
@@ -100,20 +102,40 @@ public class TelegramBot extends TelegramLongPollingBot {
                     System.out.println(5);
                     break;
                 case "single_room":
-                    setRoom(chatId,messageId,"src\\main\\resources\\images\\ph.jpg",language.getSingleRoomDescription());
+                    setRoom(chatId,messageId, ImagesConfig.singleRoomImage,language.getSingleRoomDescription());
                     break;
                 case "double_room":
+                    setRoom(chatId,messageId, ImagesConfig.doubleRoomImage,language.getDoubleEconomyRoomDescription());
                     break;
                 case "double_room+":
+                    setRoom(chatId,messageId, ImagesConfig.doublePlusRoomImage,language.getDoubleComfortRoomDescription());
                     break;
                 case "lux":
+                    setRoom(chatId,messageId, ImagesConfig.luxRoomImage,language.getLuxRoomDescription());
                     break;
                 case "back_to_main_menu":
+                    backToMainMenu(chatId,messageId,update.getCallbackQuery()
+                            .getMessage().getChat().getFirstName());
                     break;
             }
         }
     }
 
+    private void backToMainMenu(Long chatId, Integer messageId, String name){
+        DeleteMessage deleteMessage = new DeleteMessage();
+        deleteMessage.setChatId(String.valueOf(chatId));
+        deleteMessage.setMessageId(messageId);
+        try{
+            sendMessage(chatId,
+                    String.format(language.getStartString(),name),keyboards.getMainMenuKeyboard(language));
+
+            execute(deleteMessage);
+        }
+        catch (TelegramApiException e){
+            e.printStackTrace();
+        }
+
+    }
     private void setRoomsPage(Long chatId, Integer messageId) {
         EditMessageText editMessage = new EditMessageText();
         editMessage.setChatId(String.valueOf(chatId));
@@ -123,7 +145,20 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             execute(editMessage);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            if(e.getMessage().equals("Error editing message text: [400] Bad Request: there is no text in the message to edit")){
+                DeleteMessage deleteMessage = new DeleteMessage();
+                deleteMessage.setChatId(String.valueOf(chatId));
+                deleteMessage.setMessageId(messageId);
+                try{
+                    sendMessage(chatId,language.getRoomsMenuDescription(),keyboards.getRoomsKeyboard(language));
+                    execute(deleteMessage);
+                } catch (TelegramApiException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            else {
+                e.printStackTrace();
+            }
         }
     }
     private void setRoom(Long chatId, Integer messageId,String imgURL, String description){
@@ -144,7 +179,19 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
 
     }
+    private void showPrises(long chatId,int messageId){
+        EditMessageText editMessage = new EditMessageText();
+        editMessage.setChatId(String.valueOf(chatId));
+        editMessage.setMessageId(messageId);
+        editMessage.setText(language.getPrises());
+        editMessage.setReplyMarkup(keyboards.getBackToMainMenuKeyboard(language));
+        try {
+            execute(editMessage);
+        }
+        catch (TelegramApiException e){
 
+        }
+    }
     private void chooseLanguage(Long chatId) {
         if(chatId==null) return;
         SendMessage sendMessage = new SendMessage();

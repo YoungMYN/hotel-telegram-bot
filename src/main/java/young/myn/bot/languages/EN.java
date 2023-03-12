@@ -30,4 +30,9 @@ public class EN extends Language {
     private final String luxRoomDescription="Luxurious royal room of over 150m² with separate dining room," +
             " loggia and private elevator.";
     private final String backString = "<- Back";
+    private final String prises = "Prices for our rooms:\n" +
+            "Single - 2,000 rubles / day\n" +
+            "Double economy - 3,000 rubles / day\n" +
+            "Double comfort - 3 800 rubles / day\n" +
+            "Presidential suite - 20,000 rubles / day  \n";
 }

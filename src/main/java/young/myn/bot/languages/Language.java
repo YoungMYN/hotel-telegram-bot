@@ -18,7 +18,7 @@ public abstract class Language {
     public abstract String getRoomsMenuDescription();
 
     public abstract List<String> getRoomsMenuButtons();
-
+    public abstract String getPrises();
     public abstract String getSingleRoomDescription();
     public abstract String getDoubleEconomyRoomDescription();
     public abstract String getDoubleComfortRoomDescription();
