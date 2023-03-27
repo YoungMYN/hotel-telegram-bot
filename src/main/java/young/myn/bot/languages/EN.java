@@ -2,12 +2,62 @@ package young.myn.bot.languages;
 
 import lombok.Data;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Data
 public class EN extends Language {
+    private Map<Integer, Map<String,Integer>> allMonthsWithDays = new TreeMap<>();
+    {
 
+        allMonthsWithDays.put(0,new HashMap<>(){{
+            put("JANUARY",31);
+        }
+        });
+        allMonthsWithDays.put(1,new HashMap<>(){{
+            put("FEBRUARY",28);
+        }
+        });
+        allMonthsWithDays.put(2,new HashMap<>(){{
+            put("MARCH",31);
+        }
+        });
+        allMonthsWithDays.put(3,new HashMap<>(){{
+            put("APRIL",30);
+        }
+        });
+        allMonthsWithDays.put(4,new HashMap<>(){{
+            put("MAY",31);
+        }
+        });
+        allMonthsWithDays.put(5,new HashMap<>(){{
+            put("JUNE",30);
+        }
+        });
+        allMonthsWithDays.put(6,new HashMap<>(){{
+            put("JULY",31);
+        }
+        });
+        allMonthsWithDays.put(7,new HashMap<>(){{
+            put("AUGUST",31);
+        }
+        });
+        allMonthsWithDays.put(8,new HashMap<>(){{
+            put("SEPTEMBER",30);
+        }
+        });
+        allMonthsWithDays.put(9,new HashMap<>(){{
+            put("OCTOBER",31);
+        }
+        });
+        allMonthsWithDays.put(10,new HashMap<>(){{
+            put("NOVEMBER",30);
+        }
+        });
+        allMonthsWithDays.put(11,new HashMap<>(){{
+            put("DECEMBER",31);
+        }
+        });
+    }
     private final String priceDescription = "current prices for our rooms";
     private final String roomsDescription ="description&photos of our rooms";
     private final String reservationDescription ="calendar of available rooms/booking";
@@ -35,4 +85,8 @@ public class EN extends Language {
             "Double economy - 3,000 rubles / day\n" +
             "Double comfort - 3 800 rubles / day\n" +
             "Presidential suite - 20,000 rubles / day  \n";
+    private final String bookingStartString = "Select your planned arrival and departure dates:";
+    private final String clearBookingString = "Clear";
+    private final String submitBookingString = "Submit";
+    private final String availableRoomsString = "Rooms available for the selected dates:";
 }

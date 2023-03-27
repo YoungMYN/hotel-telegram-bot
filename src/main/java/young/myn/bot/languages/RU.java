@@ -2,11 +2,61 @@ package young.myn.bot.languages;
 
 import lombok.Data;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Data
 public class RU extends Language{
+    private Map<Integer, Map<String,Integer>> allMonthsWithDays = new TreeMap<>();
+    {
+        allMonthsWithDays.put(0,new HashMap<>(){{
+            put("ЯНВАРЬ",31);
+        }
+        });
+        allMonthsWithDays.put(1,new HashMap<>(){{
+            put("ФЕВРАЛЬ",28);
+        }
+        });
+        allMonthsWithDays.put(2,new HashMap<>(){{
+            put("МАРТ",31);
+        }
+        });
+        allMonthsWithDays.put(3,new HashMap<>(){{
+            put("АПРЕЛЬ",30);
+        }
+        });
+        allMonthsWithDays.put(4,new HashMap<>(){{
+            put("МАЙ",31);
+        }
+        });
+        allMonthsWithDays.put(5,new HashMap<>(){{
+            put("ИЮНЬ",30);
+        }
+        });
+        allMonthsWithDays.put(6,new HashMap<>(){{
+            put("ИЮЛЬ",31);
+        }
+        });
+        allMonthsWithDays.put(7,new HashMap<>(){{
+            put("АВГУСТ",31);
+        }
+        });
+        allMonthsWithDays.put(8,new HashMap<>(){{
+            put("СЕНТЯБРЬ",30);
+        }
+        });
+        allMonthsWithDays.put(9,new HashMap<>(){{
+            put("ОКТЯБРЬ",31);
+        }
+        });
+        allMonthsWithDays.put(10,new HashMap<>(){{
+            put("НОЯБРЬ",30);
+        }
+        });
+        allMonthsWithDays.put(11,new HashMap<>(){{
+            put("ДЕКАБРЬ",31);
+        }
+        });
+    }
     private final String startString = "Здравствуй, %s! Приветствуем тебя в нашем отеле! !\n" +
             "Этот бот поможет тебе забронировать комнату, покажет доступные даты, а также наши цены и много чего еще.";
     private final String notRecognisedCommandString = "К сожалению, я не понимаю такую команду...\n"+
@@ -34,4 +84,9 @@ public class RU extends Language{
             "Двухместный эконом  –  3 000 рублей/сутки\n" +
             "Двухместный комфорт – 3 800 рублей/сутки\n" +
             "Президентский люкс – 20 000 рублей/сутки\n";
+    private final String bookingStartString = "Выберите планируемые даты заезда и отъезда:";
+    private final String clearBookingString = "Очистить";
+    private final String submitBookingString = "Подтвердить";
+    private final String availableRoomsString = "Номера, свободные на выбранные даты:";
+
 }

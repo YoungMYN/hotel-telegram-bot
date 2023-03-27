@@ -7,24 +7,24 @@ import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
-import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import young.myn.bot.config.BotConfig;
 import young.myn.bot.config.ImagesConfig;
 import young.myn.bot.languages.*;
+import young.myn.bot.service.widgets.Keyboards;
+import young.myn.bot.service.widgets.calendar.Calendar;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -38,7 +38,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         this.config = botConfig;
         language = new EN();
         keyboards = new Keyboards();
-
     }
     @Override
     public String getBotUsername() {
@@ -93,7 +92,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     showPrises(chatId,messageId);
                     break;
                 case "reserve":
-                    System.out.println(3);
+                    showBooking(chatId,messageId);
                     break;
                 case "contacts":
                     System.out.println(4);
@@ -113,14 +112,78 @@ public class TelegramBot extends TelegramLongPollingBot {
                 case "lux":
                     setRoom(chatId,messageId, ImagesConfig.luxRoomImage,language.getLuxRoomDescription());
                     break;
+                case "previous_month":
+                    editMessageKeyboard(chatId,messageId,Calendar.switchMonth(1,language));
+                    break;
+                case "next_month":
+                    editMessageKeyboard(chatId,messageId,Calendar.switchMonth(-1,language));
+                    break;
+                case "submit_booking":
+                    showAvailableRooms(chatId,messageId);
+                    break;
+                case "clear_booking":
+                    Calendar.booking = new HashMap<>();
+                    Calendar.clearCalendarKeyboard(language);
+                    editMessageKeyboard(chatId,messageId,Calendar.getCalendarKeyboard(language));
+                    break;
                 case "back_to_main_menu":
                     backToMainMenu(chatId,messageId,update.getCallbackQuery()
                             .getMessage().getChat().getFirstName());
                     break;
+                default:
+                    if(update.getCallbackQuery().getData().matches("[0-9]+[0-9]+.+[0-9]+[0-9]+.+[0-9]+[0-9]+[0-9]+[0-9]")){
+                        String date =update.getCallbackQuery().getData();
+                        System.out.println(date);
+                        if(Calendar.isBookingFull()){
+                            Calendar.booking = new HashMap<>();
+                            Calendar.clearCalendarKeyboard(language);
+                            editMessageKeyboard(chatId,messageId,Calendar.getCalendarKeyboard(language));
+                        }
+                        else if(Calendar.checkValidValue(date)){
+                            InlineKeyboardMarkup keyboard = Calendar.getCalendarKeyboard(language);
+                            String day = (date.split("\\.")[0].equals("10")||date.split("\\.")[0].equals("20")
+                                    ||date.split("\\.")[0].equals("30")) ? date.split("\\.")[0] :
+                                    date.split("\\.")[0].replaceFirst("0","");
+                            for(List<InlineKeyboardButton> i : keyboard.getKeyboard()){
+                                for(InlineKeyboardButton j:i){
+                                    if(j.getText().equals(day)){
+                                        j.setText("$");
+                                        editMessageKeyboard(chatId,messageId,keyboard);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if(Calendar.isBookingFull()){
+                            InlineKeyboardMarkup keyboard = Calendar.getCalendarKeyboard(language);
+
+                            List<InlineKeyboardButton> submitRow = new ArrayList<>();
+                            InlineKeyboardButton submit = new InlineKeyboardButton(language.getSubmitBookingString());
+                            submit.setCallbackData("submit_booking");
+                            submitRow.add(submit);
+
+                            List<List<InlineKeyboardButton>> newKeyboard = keyboard.getKeyboard();
+                            newKeyboard.add(keyboard.getKeyboard().size()-2,submitRow);
+                            editMessageKeyboard(chatId,messageId,new InlineKeyboardMarkup(newKeyboard));
+                        }//???
+                        System.out.println(Calendar.booking.get("FROM"));
+                        System.out.println(Calendar.booking.get("TO"));
+                    }
             }
         }
     }
-
+    private void showAvailableRooms(Long chatId, Integer messageId){
+        EditMessageText editMessage = new EditMessageText();
+        editMessage.setChatId(String.valueOf(chatId));
+        editMessage.setMessageId(messageId);
+        editMessage.setText(language.getAvailableRoomsString());
+        editMessage.setReplyMarkup(Calendar.getAvailableRoomsKeyboard());
+        try{
+            execute(editMessage);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
     private void backToMainMenu(Long chatId, Integer messageId, String name){
         DeleteMessage deleteMessage = new DeleteMessage();
         deleteMessage.setChatId(String.valueOf(chatId));
@@ -179,6 +242,19 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
 
     }
+    private void showBooking(long chatId,int messageId){
+        EditMessageText editMessage = new EditMessageText();
+        editMessage.setChatId(String.valueOf(chatId));
+        editMessage.setMessageId(messageId);
+        editMessage.setText(language.getBookingStartString());
+        editMessage.setReplyMarkup(Calendar.getCalendarKeyboard(language));
+        try {
+            execute(editMessage);
+        }
+        catch (TelegramApiException e){
+
+        }
+    }
     private void showPrises(long chatId,int messageId){
         EditMessageText editMessage = new EditMessageText();
         editMessage.setChatId(String.valueOf(chatId));
@@ -205,7 +281,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-
     private void createMenu(Language language){
         List<BotCommand> listOfCommands = new ArrayList<>();
         listOfCommands.add(new BotCommand("/rooms", language.getRoomsDescription()));
@@ -219,7 +294,18 @@ public class TelegramBot extends TelegramLongPollingBot {
             log.error("Error setting bot's command list: " + e.getMessage());
         }
     }
+    private void editMessageKeyboard(long chatId,int messageId,InlineKeyboardMarkup keyboard){
+        EditMessageReplyMarkup editMessage = new EditMessageReplyMarkup();
+        editMessage.setChatId(String.valueOf(chatId));
+        editMessage.setMessageId(messageId);
+        editMessage.setReplyMarkup(keyboard);
+        try {
+            execute(editMessage);
+        }
+        catch (TelegramApiException e){
 
+        }
+    }
     private void sendMessage(Long chatId, String messageText){
         if(chatId==null||messageText==null){
             return;

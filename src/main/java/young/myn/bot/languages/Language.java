@@ -2,7 +2,7 @@ package young.myn.bot.languages;
 
 
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.Map;
 
 public abstract class Language {
     public abstract String getPriceDescription();
@@ -19,11 +19,14 @@ public abstract class Language {
 
     public abstract List<String> getRoomsMenuButtons();
     public abstract String getPrises();
+    public abstract String getBookingStartString();
     public abstract String getSingleRoomDescription();
     public abstract String getDoubleEconomyRoomDescription();
     public abstract String getDoubleComfortRoomDescription();
     public abstract String getLuxRoomDescription();
-
-
+    public abstract Map<Integer, Map<String,Integer>> getAllMonthsWithDays();
+    public abstract String getClearBookingString();
     public abstract String getBackString();
+    public abstract String getSubmitBookingString();
+    public abstract String getAvailableRoomsString();
 }

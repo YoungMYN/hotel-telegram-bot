@@ -1,14 +1,17 @@
-package young.myn.bot.service;
+package young.myn.bot.service.widgets;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import young.myn.bot.languages.EN;
 import young.myn.bot.languages.Language;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Keyboards {
+
+    public Keyboards(){
+    }
+
     public InlineKeyboardMarkup getLanguageKeyboard() {
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
@@ -104,4 +107,5 @@ public class Keyboards {
         markup.setKeyboard(rows);
         return markup;
     }
+
 }
