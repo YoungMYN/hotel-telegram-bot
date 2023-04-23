@@ -5,9 +5,12 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import young.myn.bot.entities.Reservation;
 import young.myn.bot.entities.Room;
+import young.myn.bot.enums.RoomType;
+import young.myn.bot.languages.EN;
 import young.myn.bot.languages.Language;
 import young.myn.bot.util.HibernateUtil;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -15,6 +18,12 @@ import java.util.*;
 public class Calendar {
     public static HashMap<String, Date> booking = new HashMap<>();
     private static InlineKeyboardMarkup calendarKeyboard;
+
+    public static HashMap<RoomType, Integer> getFreeRoomsOfEachType() {
+        return freeRoomsOfEachType;
+    }
+
+    private static HashMap<RoomType,Integer> freeRoomsOfEachType = new HashMap<>();
     public static InlineKeyboardMarkup getCalendarKeyboard(Language language){
         if(calendarKeyboard==null){
             calendarKeyboard = createNewCalendarKeyboard(language);
@@ -23,6 +32,7 @@ public class Calendar {
     }
     public static void clearCalendarKeyboard(Language language){
         calendarKeyboard = createNewCalendarKeyboard(language);
+        booking = new HashMap<>();
     }
     private static InlineKeyboardMarkup createNewCalendarKeyboard(Language language){
         java.util.Calendar date = java.util.Calendar.getInstance();
@@ -91,7 +101,6 @@ public class Calendar {
                 break;
             }
         }
-        System.out.println(quantityOfDays);
         java.util.Calendar instance = java.util.Calendar.getInstance();
         int year = (numberOfMonth>=instance.get(java.util.Calendar.MONTH)) ?
                 instance.get(java.util.Calendar.YEAR) : instance.get(java.util.Calendar.YEAR)+1;
@@ -169,14 +178,18 @@ public class Calendar {
                 break;
             }
         }
+        System.out.println(previousMonth+" "+nextMonth);
         InlineKeyboardMarkup calendar = new InlineKeyboardMarkup();
+        System.out.println((step==1)?nextMonth:previousMonth);
         List<List<InlineKeyboardButton>> rows =
                 createCalendarKeyboard((step==1)?nextMonth:previousMonth,language);
         calendar.setKeyboard(rows);
+        calendarKeyboard = calendar;
         return calendar;
 
     }
-    public static InlineKeyboardMarkup getAvailableRoomsKeyboard(){
+    public static InlineKeyboardMarkup getAvailableRoomsKeyboard(Language language){
+        Set<RoomType> availableTypesOfRooms = new TreeSet<>();
         try(Session session = HibernateUtil.getSession()){
             session.beginTransaction();
 
@@ -184,13 +197,71 @@ public class Calendar {
             List<Room> rooms = session.createQuery(sqlRooms,Room.class).list();
             String sqlReservations = "From " + Reservation.class.getSimpleName();
             List<Reservation> reservations = session.createQuery(sqlReservations,Reservation.class).list();
-            for(Room i:rooms){
-                for(Reservation j: reservations){
-
+            for(Room room:rooms){
+                boolean free = true;
+                for(Reservation reservation: reservations){
+                    if(reservation.getRoom().getId().equals(room.getId())){
+                        GregorianCalendar from = new GregorianCalendar();
+                        from.setTime(booking.get("FROM"));
+                        GregorianCalendar to = new GregorianCalendar();
+                        to.setTime(booking.get("TO"));
+                        if(!(reservation.getEndDate().before(from) || reservation.getStartDate().after(to))){
+                            free = false;
+                        }
+                    }
+                }
+                if(free){
+                    availableTypesOfRooms.add(room.getType());
+                    System.out.println(room.getType().toString() + room.getId());
+                    freeRoomsOfEachType.put(room.getType(), room.getId());
                 }
             }
-
         }
-        return null;
+        return generateKeyboardByRoomTypes(availableTypesOfRooms, language);
+    }
+    private static InlineKeyboardMarkup generateKeyboardByRoomTypes(Set<RoomType> types,Language language){
+        InlineKeyboardMarkup keyboard = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        for(RoomType i:types){
+            List<InlineKeyboardButton> row = new ArrayList<>();
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            switch (i){
+                case SINGLE :
+                    button.setText(language.getRoomsMenuButtons().get(0));
+                    button.setCallbackData("single_room_clicked");
+                    break;
+                case DOUBLE:
+                    button.setText(language.getRoomsMenuButtons().get(1));
+                    button.setCallbackData("double_room_clicked");
+                    break;
+                case DOUBLE_PLUS :
+                    button.setText(language.getRoomsMenuButtons().get(2));
+                    button.setCallbackData("double_plus_room_clicked");
+                    break;
+                case LUX:
+                    button.setText(language.getRoomsMenuButtons().get(3));
+                    button.setCallbackData("lux_room_clicked");
+                    break;
+            }
+            row.add(button);
+            rows.add(row);
+        }
+        List<InlineKeyboardButton> back_row = new ArrayList<>();
+        InlineKeyboardButton backButton = new InlineKeyboardButton();
+        backButton.setText(language.getBackString());
+        backButton.setCallbackData("reserve");
+        back_row.add(backButton);
+        rows.add(back_row);
+        keyboard.setKeyboard(rows);
+        return keyboard;
+    }
+    public static String getBookingDates(Language language){
+        java.util.Calendar from = java.util.Calendar.getInstance();
+        from.setTime(booking.get("FROM"));
+        java.util.Calendar to = java.util.Calendar.getInstance();
+        to.setTime(booking.get("TO"));
+
+        DateFormat df = new SimpleDateFormat("dd MMMMMMMM yyyy", (language instanceof EN)?new Locale("en","US"):new Locale("ru"));
+        return "\n"+df.format(from.getTime())+" - "+df.format(to.getTime());
     }
 }

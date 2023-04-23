@@ -11,7 +11,6 @@ import young.myn.bot.service.TelegramBot;
 
 @Component
 public class BotInitializer {
-
     @Autowired
     TelegramBot bot;
 

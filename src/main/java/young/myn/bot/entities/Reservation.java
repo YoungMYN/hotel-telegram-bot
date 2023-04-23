@@ -2,7 +2,7 @@ package young.myn.bot.entities;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
+
 import java.util.GregorianCalendar;
 
 

@@ -1,12 +1,13 @@
 package young.myn.bot.service.widgets;
 
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import young.myn.bot.languages.EN;
 import young.myn.bot.languages.Language;
 
 import java.util.*;
-
+@Service
 public class Keyboards {
 
     public Keyboards(){
@@ -92,6 +93,20 @@ public class Keyboards {
         markup.setKeyboard(rows);
         return markup;
     }
+    public InlineKeyboardMarkup getConfirmPhoneKeyboard(Language language){
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        List<InlineKeyboardButton> submitRow = new ArrayList<>();
+        InlineKeyboardButton submit = new InlineKeyboardButton(language.getSubmitBookingString());
+        submit.setCallbackData("phone_submitted");
+        submitRow.add(submit);
+        List<InlineKeyboardButton> backRow = new ArrayList<>();
+        InlineKeyboardButton back = new InlineKeyboardButton(language.getBackString());
+        back.setCallbackData("back_to_phone_input");
+        backRow.add(back);
+        rows.add(submitRow);
+        rows.add(backRow);
+        return new InlineKeyboardMarkup(rows);
+    }
     public InlineKeyboardMarkup getBackToMainMenuKeyboard(Language language){
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
@@ -103,7 +118,6 @@ public class Keyboards {
         row.add(button);
 
         rows.add(row);
-
         markup.setKeyboard(rows);
         return markup;
     }

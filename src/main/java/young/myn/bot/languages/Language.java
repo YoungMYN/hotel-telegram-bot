@@ -24,9 +24,14 @@ public abstract class Language {
     public abstract String getDoubleEconomyRoomDescription();
     public abstract String getDoubleComfortRoomDescription();
     public abstract String getLuxRoomDescription();
+    public abstract String getShareContactString();
     public abstract Map<Integer, Map<String,Integer>> getAllMonthsWithDays();
     public abstract String getClearBookingString();
+    public abstract String getConfirmPhoneString();
+    public abstract String getEmailRequestString();
     public abstract String getBackString();
     public abstract String getSubmitBookingString();
     public abstract String getAvailableRoomsString();
+
+    public abstract String getNameRequest();
 }

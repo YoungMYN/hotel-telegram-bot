@@ -57,7 +57,7 @@ public class RU extends Language{
         }
         });
     }
-    private final String startString = "Здравствуй, %s! Приветствуем тебя в нашем отеле! !\n" +
+    private final String startString = "Здравствуй, %s! Приветствуем тебя в нашем отеле!\n" +
             "Этот бот поможет тебе забронировать комнату, покажет доступные даты, а также наши цены и много чего еще.";
     private final String notRecognisedCommandString = "К сожалению, я не понимаю такую команду...\n"+
             " Пожалуйста, выберите элемент из меню.";
@@ -87,6 +87,12 @@ public class RU extends Language{
     private final String bookingStartString = "Выберите планируемые даты заезда и отъезда:";
     private final String clearBookingString = "Очистить";
     private final String submitBookingString = "Подтвердить";
-    private final String availableRoomsString = "Номера, свободные на выбранные даты:";
+    private final String shareContactString = "Для подтверждения брони нам требуется ваша контактная информация.\n" +
+            "Пожалуйста, отправьте нам свой контактный номер телефона:";
 
+    private final String availableRoomsString = "Номера, свободные на выбранные даты:";
+    private final String confirmPhoneString = "Пожалуйста, перепроверьте номер телефона. \n" +
+            "На номер %s в ближайшее время позвонит наш администратор для подтверждения бронирования";
+    private final String emailRequestString = "Пожалуйста, введите адрес вашей электронной почты:";
+    private final String nameRequest = "Как можно к вам обращаться?";
 }

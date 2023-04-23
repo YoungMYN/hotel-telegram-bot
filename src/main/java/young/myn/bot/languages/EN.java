@@ -88,5 +88,11 @@ public class EN extends Language {
     private final String bookingStartString = "Select your planned arrival and departure dates:";
     private final String clearBookingString = "Clear";
     private final String submitBookingString = "Submit";
+    private final String shareContactString = "We need your contact information to confirm your booking.\n " +
+            "Please send your phone number:";
     private final String availableRoomsString = "Rooms available for the selected dates:";
+    private final String confirmPhoneString = "Please double check your phone number. \n" +
+            "%s will be called by our administrator shortly to confirm the booking";
+    private final String emailRequestString = "Please enter your email address:";
+    private final String nameRequest = "What is your name?";
 }
